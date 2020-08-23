@@ -97,9 +97,9 @@ impl Board {
         //(possible & opponent_win) & !(opponent_win >> 1)
         if forced_moves > 0 {
             if (forced_moves & (forced_moves - 1)) == 0 {
-                return 0;
-            } else {
                 possible = forced_moves;
+            } else {
+                return 0;
             }
         }
         possible & !(opponent_win >> 1)
@@ -253,10 +253,8 @@ pub fn solve(position: Board, table: &mut Table) -> i32 {
 
 // at least alpha, at most beta
 pub fn negamax(position: Board, table: &mut Table, mut alpha: i32, mut beta: i32) -> i32 {
-    let possible = position.nonlosing_moves();
-    //if possible == 0 {
-    //    return -(((Board::WIDTH * Board::HEIGHT - position.nb_moves())/2) as i32)
-    //}
+
+
     if position.nb_moves() == Board::HEIGHT * Board::WIDTH {
         return 0;
     }
@@ -266,6 +264,16 @@ pub fn negamax(position: Board, table: &mut Table, mut alpha: i32, mut beta: i32
         score /= 2; // allows encoding for different players is symmetric
         return score as i32;
     }
+
+    let possible = position.nonlosing_moves();
+    if possible == 0 {
+        let mut score = Board::HEIGHT * Board::WIDTH - position.nb_moves();
+        score /= 2; // allows encoding for different players is symmetric
+        return -(score as i32);
+    }
+
+
+
     
 
     //let max = ((Board::WIDTH * Board::HEIGHT - 1 - position.nb_moves()) / 2) as i32;
@@ -407,7 +415,7 @@ pub struct Table {
 }
 
 impl Table {
-    const CAPACITY: u64 = 8000000 * 2;
+    const CAPACITY: u64 = 8388593;
 
     pub fn new() -> Table {
         let empty = TableNode { node: 0 };
@@ -564,5 +572,18 @@ mod board_tests {
                 }
             );
         }
+    }
+
+    #[test]
+    fn opponent_winning_moves() {
+        let board = Board::construct("2252576253462244111563365343671351441");
+        board.display();
+        let mut table = Table::new();
+        let result = negamax(board, &mut table, -100, 100);
+        println!("result {}", result);
+        println!("opponent win {:b}", board.opponent_winning_moves());
+        println!("possible       {:b}", board.possible());
+        println!("&                  {:b}", board.possible() & board.opponent_winning_moves());
+        println!("nonlosing                 {:b}", board.nonlosing_moves());
     }
 }
