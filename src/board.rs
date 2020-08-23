@@ -33,7 +33,7 @@ impl Board {
         board
     }
 
-    fn hash(&self) -> u64 {
+    pub fn hash(&self) -> u64 {
         self.stones_all + self.stones_player
     }
 
@@ -70,7 +70,7 @@ impl Board {
         (self.stones_all + Board::bottom_mask()) & Board::board_mask()
     }
 
-    fn action_score(&self, action: u64) -> i32 {
+    pub fn action_score(&self, action: u64) -> i32 {
         let winning_moves =
             Board::compute_winning_moves(self.stones_player | action, self.stones_all);
         Board::pop_count(winning_moves)
@@ -90,7 +90,7 @@ impl Board {
         result
     }
 
-    fn nonlosing_moves(&self) -> u64 {
+    pub fn nonlosing_moves(&self) -> u64 {
         let mut possible = self.possible();
         let opponent_win = self.opponent_winning_moves();
         let forced_moves = possible & opponent_win;
@@ -181,7 +181,7 @@ impl Board {
         //result
     }
 
-    fn nb_moves(&self) -> u8 {
+    pub fn nb_moves(&self) -> u8 {
         self.num_moves
     }
 
@@ -189,7 +189,7 @@ impl Board {
         1_u64 << (Board::HEIGHT - 1) << (col * (Board::HEIGHT + 1))
     }
 
-    fn col_mask(col: u8) -> u64 {
+    pub fn col_mask(col: u8) -> u64 {
         (1_u64 << Board::HEIGHT) - 1 << (col * (Board::HEIGHT + 1))
     }
 
@@ -230,236 +230,9 @@ impl Board {
     }
 }
 
-pub fn solve(position: Board, table: &mut Table) -> i32 {
-    let mut min = -((Board::WIDTH * Board::HEIGHT - position.nb_moves()) as i32) / 2;
-    let mut max = ((Board::WIDTH * Board::HEIGHT + 1 - position.nb_moves()) as i32) / 2;
-
-    while min < max {
-        let mut med = min + (max - min) / 2;
-        if med <= 0 && min / 2 < med {
-            med = min / 2;
-        } else if med >= 0 && max / 2 > med {
-            med = max / 2;
-        }
-        let result = negamax(position, table, med, med + 1);
-        if result <= med {
-            max = result;
-        } else {
-            min = result;
-        }
-    }
-    return min;
-}
-
-// at least alpha, at most beta
-pub fn negamax(position: Board, table: &mut Table, mut alpha: i32, mut beta: i32) -> i32 {
-
-
-    if position.nb_moves() == Board::HEIGHT * Board::WIDTH {
-        return 0;
-    }
-
-    if position.can_win_next() {
-        let mut score = Board::HEIGHT * Board::WIDTH + 1 - position.nb_moves();
-        score /= 2; // allows encoding for different players is symmetric
-        return score as i32;
-    }
-
-    let possible = position.nonlosing_moves();
-    if possible == 0 {
-        let mut score = Board::HEIGHT * Board::WIDTH - position.nb_moves();
-        score /= 2; // allows encoding for different players is symmetric
-        return -(score as i32);
-    }
-
-
-
-    
-
-    //let max = ((Board::WIDTH * Board::HEIGHT - 1 - position.nb_moves()) / 2) as i32;
-    let max;
-    match table.get(&position) {
-        Some(score) => max = score + Board::MIN_SCORE - 1,
-        None => max = ((Board::WIDTH * Board::HEIGHT - 1 - position.nb_moves()) / 2) as i32,
-    }
-
-    if beta > max {
-        beta = max;
-        if alpha >= beta {
-            return beta;
-        }
-    }
-
-    /*
-    let mut move_sort = MoveSort::new();
-    for i in 0..Board::WIDTH {
-        let action = possible & Board::col_mask(i);
-        if action > 0 {
-            let value = position.action_score(action);
-            move_sort.insert(action, value);
-        }
-    }
-
-
-    while move_sort.size > 0 {
-        let action = move_sort.getNext().action;
-        let mut next_position = position.copy();
-        next_position.play(action);
-        let score = -negamax(next_position, table, -beta, -alpha);
-        if score >= beta {
-            return score;
-        }
-        if score > alpha {
-            alpha = score;
-        }
-    }
-    */
-    for i in 0..Board::WIDTH {
-        if position.can_play(Board::exploration_order[i as usize]) {
-            let action = Board::exploration_order[i as usize];
-            let mut next_position = position.copy();
-            next_position.play_col(action);
-            let score = -negamax(next_position, table, -beta, -alpha);
-            if score >= beta {
-                return score;
-            }
-            if score > alpha {
-                alpha = score;
-            }
-        }
-    }
-
-    table.add(&position, alpha - Board::MIN_SCORE + 1);
-
-    return alpha;
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-struct MoveNode {
-    action: u64,
-    value: i32,
-}
-
-// sort from minimum to maximum
-struct MoveSort {
-    pub moves: Vec<MoveNode>,
-    size: usize,
-}
-
-impl MoveSort {
-    fn new() -> MoveSort {
-        let moves = vec![
-            MoveNode {
-                action: 0,
-                value: 0
-            };
-            7
-        ];
-        MoveSort {
-            moves: moves,
-            size: 0,
-        }
-    }
-
-    fn clear(&mut self) {
-        self.size = 0;
-    }
-
-    fn insert(&mut self, action: u64, value: i32) {
-        self.size += 1;
-        // increase the size
-        // shift things over by 1 until you find a move with a bigger value or you have shifted everything over
-        // then insert at that location
-        let mut current = self.size - 1;
-        while current > 0 && self.moves[current - 1].value > value {
-            self.moves[current] = self.moves[current - 1];
-            current -= 1;
-        }
-        self.moves[current].action = action;
-        self.moves[current].value = value;
-    }
-
-    fn getNext(&mut self) -> MoveNode {
-        self.size -= 1;
-        self.moves[self.size]
-    }
-}
-
-#[derive(Clone, Copy)]
-struct TableNode {
-    node: u64,
-}
-
-impl TableNode {
-    const hash_mask: u64 = (1_u64 << 49) - 1;
-
-    fn get_value(&self) -> i8 {
-        (self.node & ((1_u64 << 8) - 1)) as i8
-    }
-
-    fn get_hash(&self) -> u64 {
-        self.node >> 8
-    }
-
-    fn new(key: u64, value: i8) -> TableNode {
-        TableNode {
-            node: (key << 8) | (value as u64),
-        }
-    }
-}
-
-pub struct Table {
-    contents: Vec<TableNode>,
-    add_count: i32,
-    get_count: i32,
-}
-
-impl Table {
-    const CAPACITY: u64 = 8388593;
-
-    pub fn new() -> Table {
-        let empty = TableNode { node: 0 };
-        Table {
-            contents: vec![empty; Table::CAPACITY as usize],
-            add_count: 0,
-            get_count: 0,
-        }
-    }
-
-    fn add(&mut self, position: &Board, score: i32) {
-        self.add_count += 1;
-        let index = (position.hash() % Table::CAPACITY) as usize;
-        self.contents[index] = TableNode::new(position.hash(), score as i8);
-    }
-
-    fn get(&mut self, position: &Board) -> Option<i32> {
-        self.get_count += 1;
-        let index = (position.hash() % Table::CAPACITY) as usize;
-        let node = self.contents[index];
-        if node.get_hash() == position.hash() {
-            return Some(node.get_value() as i32);
-        } else {
-            return None;
-        }
-    }
-
-    pub fn clear(&mut self) {
-        let empty = TableNode { node: 0 };
-        for i in 0..Table::CAPACITY {
-            self.contents[i as usize] = empty;
-        }
-    }
-
-    pub fn results(&self) {
-        println!(
-            "There have been {} adds and {} gets",
-            self.add_count, self.get_count
-        );
-    }
-}
 
 #[cfg(test)]
-mod board_tests {
+mod tests {
     use super::*;
 
     #[test]
@@ -490,7 +263,7 @@ mod board_tests {
         board.play_col(0);
         assert_eq!(board.stones_all, 2_u64.pow(Board::HEIGHT as u32 + 1) + 1);
     }
-
+    
     #[test]
     fn accessor() {
         let mut board = Board::new();
@@ -526,64 +299,18 @@ mod board_tests {
     }
 
     #[test]
-    fn table() {
-        let board = Board::construct("162636");
-        let mut table = Table::new();
-        table.add(&board, 20);
-        assert_eq!(table.get(&board), Some(20));
-        table.add(&board, 10);
-        assert_eq!(table.get(&board), Some(10));
-
-        table.results();
-    }
-
-    #[test]
     fn opponent_win() {
         let board_org = Board::construct("13141");
         let mut board = Board::construct("13141");
         let op_win = board.opponent_winning_moves();
         assert_eq!(board, board_org);
-
+    
         assert_eq!(op_win, 1_u64 << 3);
         let mut board = Board::construct("1");
-
+    
         assert_eq!(
             board.nonlosing_moves() ^ (1_u64 << 1) | 1_u64,
             Board::bottom_mask()
         );
-    }
-
-    #[test]
-    fn move_sorter() {
-        let mut sorter = MoveSort::new();
-        sorter.insert(0, 0);
-        sorter.insert(5, 5);
-        sorter.insert(1, 1);
-        sorter.insert(4, 4);
-        sorter.insert(2, 2);
-        sorter.insert(3, 3);
-        //let mut action = sorter.getNext();
-        for i in (0..6).rev() {
-            assert_eq!(
-                sorter.getNext(),
-                MoveNode {
-                    action: i,
-                    value: i as i32
-                }
-            );
-        }
-    }
-
-    #[test]
-    fn opponent_winning_moves() {
-        let board = Board::construct("2252576253462244111563365343671351441");
-        board.display();
-        let mut table = Table::new();
-        let result = negamax(board, &mut table, -100, 100);
-        println!("result {}", result);
-        println!("opponent win {:b}", board.opponent_winning_moves());
-        println!("possible       {:b}", board.possible());
-        println!("&                  {:b}", board.possible() & board.opponent_winning_moves());
-        println!("nonlosing                 {:b}", board.nonlosing_moves());
     }
 }

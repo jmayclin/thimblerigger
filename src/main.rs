@@ -1,9 +1,17 @@
 // I wonder whether 8 capacity would make things
 // faster?
+
+mod board;
+mod sort;
+mod table;
+mod solver;
+
 use std::error::Error;
 use std::fs;
 use std::time::Instant;
-use thimblerigger::{Board, Table};
+use board::Board;
+use table::Table;
+use solver::solve;
 
 fn main() {
     println!("Hello, world!");
@@ -12,16 +20,16 @@ fn main() {
     board = Board::construct("5255312676617552463");
     let mut table = Table::new();
     board.display();
-    let result = thimblerigger::solve(board, &mut table);
+    let result = solve(board, &mut table);
     println!("{}", result);
     let mut count = 0;
 
     let files = vec![
-        "test_cases/Test_L3_R1",
-        "test_cases/Test_L2_R1",
-        "test_cases/Test_L2_R2",
-        "test_cases/Test_L1_R1",
-        "test_cases/Test_L1_R2",
+        //"test_cases/Test_L3_R1",
+        //"test_cases/Test_L2_R1",
+        //"test_cases/Test_L2_R2",
+        //"test_cases/Test_L1_R1",
+        //"test_cases/Test_L1_R2",
         "test_cases/Test_L1_R3",
     ];
 
@@ -39,7 +47,8 @@ fn main() {
             //let min = -100;
             //let max = 100;
             //let result = thimblerigger::negamax(board, &mut table, min, max);
-            let result = thimblerigger::solve(board, & mut table);
+            let result = solve(board, &mut table);
+            //table.clear();
             if expect != result {
                 println!(
                     "Your incompetence is astounding. State: {} was {} but should be {}",
@@ -47,6 +56,11 @@ fn main() {
                 );
                 panic!();
             }
+            println!(
+                "\taverage time of {} microseconds from {} trials",
+                now.elapsed().as_micros() / count,
+                count
+            );
         }
         println!(
             "{} | average time of {} microseconds from {} trials",

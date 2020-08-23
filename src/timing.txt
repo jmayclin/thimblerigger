@@ -1,0 +1,23 @@
+timing results transposition + iterative deepening
+
+calculating for test_cases/Test_L3_R1
+test_cases/Test_L3_R1 | average time of 46 microseconds from 1000 trials
+calculating for test_cases/Test_L2_R1
+test_cases/Test_L2_R1 | average time of 283 microseconds from 1000 trials
+calculating for test_cases/Test_L2_R2
+test_cases/Test_L2_R2 | average time of 41316 microseconds from 1000 trials
+calculating for test_cases/Test_L1_R1
+test_cases/Test_L1_R1 | average time of 8218 microseconds from 1000 trials
+
+
+anticipating losing moves, but this time with a smaller cache
+
+calculating for test_cases/Test_L3_R1
+test_cases/Test_L3_R1 | average time of 5 microseconds from 1000 trials
+calculating for test_cases/Test_L2_R1
+test_cases/Test_L2_R1 | average time of 306 microseconds from 1000 trials
+calculating for test_cases/Test_L2_R2
+test_cases/Test_L2_R2 | average time of 35921 microseconds from 1000 trials
+calculating for test_cases/Test_L1_R1
+test_cases/Test_L1_R1 | average time of 8284 microseconds from 1000 trials
+calculating for test_cases/Test_L1_R2
