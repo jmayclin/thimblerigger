@@ -6,7 +6,7 @@ struct TableNode {
 }
 
 impl TableNode {
-    const hash_mask: u64 = (1_u64 << 49) - 1;
+    const HASH_MASK: u64 = (1_u64 << 49) - 1;
 
     fn get_value(&self) -> i8 {
         (self.node & ((1_u64 << 8) - 1)) as i8
@@ -33,7 +33,7 @@ impl Table {
     const CAPACITY: u64 = 8388593 * 4;
 
     pub fn new() -> Table {
-        let empty = TableNode { node: 0 };
+        let empty = TableNode { node: TableNode::HASH_MASK };
         Table {
             contents: vec![empty; Table::CAPACITY as usize],
             add_count: 0,

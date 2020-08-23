@@ -70,6 +70,27 @@ impl Board {
         (self.stones_all + Board::bottom_mask()) & Board::board_mask()
     }
 
+    pub fn winning_move(&self) -> u8 {
+        let possible = self.possible();
+        let winning = self.winning_moves();
+        for i in 0..Board::WIDTH {
+            if Board::col_mask(i) & winning != 0 {
+                return i;
+            }
+        }
+        return 0; // this should never happen      
+    }
+
+    pub fn possible_move(&self) -> u8 {
+        let possible = self.possible();
+        for i in 0..Board::WIDTH {
+            if Board::col_mask(i) & possible != 0 {
+                return i;
+            }
+        }
+        return 0; // this should never happen
+    }
+
     pub fn action_score(&self, action: u64) -> i32 {
         let winning_moves =
             Board::compute_winning_moves(self.stones_player | action, self.stones_all);
