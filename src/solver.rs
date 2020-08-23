@@ -117,5 +117,3 @@ pub fn negamax(position: Board, table: &mut Table, mut alpha: i32, mut beta: i32
 
     return (alpha, best_action);
 }
-
-

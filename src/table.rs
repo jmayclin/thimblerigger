@@ -30,7 +30,7 @@ pub struct Table {
 }
 
 impl Table {
-    const CAPACITY: u64 = 8388593 * 4;
+    const CAPACITY: u64 = 8388593 * 2;
 
     pub fn new() -> Table {
         let empty = TableNode { node: TableNode::HASH_MASK };

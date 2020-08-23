@@ -8,7 +8,7 @@ mod table;
 
 use board::Board;
 use solver::solve;
-use std::error::Error;
+use wasm_bindgen::prelude::*;
 use std::fs;
 use std::time::Instant;
 use table::Table;
@@ -38,6 +38,14 @@ fn generate_cache(board: String, depth: u8, table: &mut Table) {
             generate_cache(format!("{}{}{}", board, i + 1, action), depth - 1, table);
         }
     }
+}
+
+pub fn do_the_magic(state: &str) -> u8 {
+    let board = Board::construct(state);
+    let mut table = Table::new();
+    let (result, mut action) = solve(board, &mut table);
+    action += 1;
+    action as u8
 }
 
 fn play_game(init: &str) {
