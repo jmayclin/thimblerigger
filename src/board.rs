@@ -74,11 +74,11 @@ impl Board {
         let possible = self.possible();
         let winning = self.winning_moves();
         for i in 0..Board::WIDTH {
-            if Board::col_mask(i) & winning != 0 {
+            if Board::col_mask(i) & winning & possible != 0 {
                 return i;
             }
         }
-        return 0; // this should never happen      
+        return 255; // this should never happen      
     }
 
     pub fn possible_move(&self) -> u8 {

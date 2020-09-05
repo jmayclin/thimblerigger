@@ -40,12 +40,12 @@ fn generate_cache(board: String, depth: u8, table: &mut Table) {
     }
 }
 
-pub fn do_the_magic(state: &str) -> u8 {
+pub fn do_the_magic(state: &str) -> (i32, i32){
     let board = Board::construct(state);
     let mut table = Table::new();
     let (result, mut action) = solve(board, &mut table);
     action += 1;
-    action as u8
+    (result, action)
 }
 
 fn play_game(init: &str) {
@@ -126,7 +126,10 @@ fn evaluate_test_sets() {
 }
 
 fn main() {
+    //evaluate_test_sets();
     println!("Hello, world!");
-    let mut table = Table::new();
-    generate_cache("4".to_string(), 7, &mut table);
+    //let mut table = Table::new();
+    //let result = do_the_magic("444447");
+    //println!("{:?}", result)
+    play_game("444345443332565356")
 }
