@@ -33,7 +33,9 @@ impl Table {
     const CAPACITY: u64 = 8388593 * 2;
 
     pub fn new() -> Table {
-        let empty = TableNode { node: TableNode::HASH_MASK };
+        let empty = TableNode {
+            node: TableNode::HASH_MASK,
+        };
         Table {
             contents: vec![empty; Table::CAPACITY as usize],
             add_count: 0,
@@ -88,6 +90,4 @@ mod board_tests {
 
         table.results();
     }
-
-
 }

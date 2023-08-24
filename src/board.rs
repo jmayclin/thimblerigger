@@ -78,7 +78,7 @@ impl Board {
                 return i;
             }
         }
-        return 255; // this should never happen      
+        return 255; // this should never happen
     }
 
     pub fn possible_move(&self) -> u8 {
@@ -107,7 +107,8 @@ impl Board {
     }
 
     fn opponent_winning_moves(&self) -> u64 {
-        let result = Board::compute_winning_moves(self.stones_player ^ self.stones_all, self.stones_all);
+        let result =
+            Board::compute_winning_moves(self.stones_player ^ self.stones_all, self.stones_all);
         result
     }
 
@@ -251,7 +252,6 @@ impl Board {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -284,7 +284,7 @@ mod tests {
         board.play_col(0);
         assert_eq!(board.stones_all, 2_u64.pow(Board::HEIGHT as u32 + 1) + 1);
     }
-    
+
     #[test]
     fn accessor() {
         let mut board = Board::new();
@@ -325,10 +325,10 @@ mod tests {
         let mut board = Board::construct("13141");
         let op_win = board.opponent_winning_moves();
         assert_eq!(board, board_org);
-    
+
         assert_eq!(op_win, 1_u64 << 3);
         let mut board = Board::construct("1");
-    
+
         assert_eq!(
             board.nonlosing_moves() ^ (1_u64 << 1) | 1_u64,
             Board::bottom_mask()

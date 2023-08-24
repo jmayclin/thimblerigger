@@ -5,10 +5,10 @@ mod table;
 
 use board::Board;
 use solver::solve;
-use wasm_bindgen::prelude::*;
 use std::fs;
 use std::time::Instant;
 use table::Table;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub fn do_the_magic(state: String) -> String {

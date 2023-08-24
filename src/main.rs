@@ -8,10 +8,10 @@ mod table;
 
 use board::Board;
 use solver::solve;
-use wasm_bindgen::prelude::*;
 use std::fs;
 use std::time::Instant;
 use table::Table;
+use wasm_bindgen::prelude::*;
 
 fn generate_cache(board: String, depth: u8, table: &mut Table) {
     if depth == 0 {
@@ -24,13 +24,7 @@ fn generate_cache(board: String, depth: u8, table: &mut Table) {
         let (result, mut action) = solve(board2, table);
         action += 1;
         if now.elapsed().as_secs_f32() > 0.25 {
-            println!(
-                "\"{}{}\":[{},{}]",
-                board,
-                i + 1,
-                action,
-                result,
-            );
+            println!("\"{}{}\":[{},{}]", board, i + 1, action, result,);
         }
         if !board2.can_win_next() {
             let mut board3 = board2;
@@ -40,7 +34,7 @@ fn generate_cache(board: String, depth: u8, table: &mut Table) {
     }
 }
 
-pub fn do_the_magic(state: &str) -> (i32, i32){
+pub fn do_the_magic(state: &str) -> (i32, i32) {
     let board = Board::construct(state);
     let mut table = Table::new();
     let (result, mut action) = solve(board, &mut table);

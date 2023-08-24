@@ -14,7 +14,10 @@ pub struct MoveSort {
 
 impl MoveSort {
     pub fn new() -> MoveSort {
-        let moves = [MoveNode{action:0, value: 0}; board::Board::WIDTH as usize];
+        let moves = [MoveNode {
+            action: 0,
+            value: 0,
+        }; board::Board::WIDTH as usize];
         MoveSort {
             moves: moves,
             size: 0,
@@ -60,10 +63,7 @@ mod tests {
         sorter.insert(3, 3);
         //let mut action = sorter.getNext();
         for i in (0..6).rev() {
-            assert_eq!(
-                sorter.get_next(),
-                i
-            );
+            assert_eq!(sorter.get_next(), i);
         }
     }
 }

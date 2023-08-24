@@ -1,6 +1,6 @@
 use super::board::Board;
-use super::table::Table;
 use super::sort::MoveSort;
+use super::table::Table;
 
 pub fn solve(position: Board, table: &mut Table) -> (i32, i32) {
     let mut min = -((Board::WIDTH * Board::HEIGHT - position.nb_moves()) as i32) / 2;
@@ -34,7 +34,6 @@ pub fn solve(position: Board, table: &mut Table) -> (i32, i32) {
 
 // at least alpha, at most beta
 pub fn negamax(position: Board, table: &mut Table, mut alpha: i32, mut beta: i32) -> (i32, i32) {
-
     let possible = position.nonlosing_moves();
     //println!("{:b}", possible);
     if possible == 0 {
@@ -47,8 +46,6 @@ pub fn negamax(position: Board, table: &mut Table, mut alpha: i32, mut beta: i32
     if position.nb_moves() >= Board::HEIGHT * Board::WIDTH - 2 {
         return (0, position.possible_move() as i32);
     }
-
-
 
     let min = -(((Board::WIDTH * Board::HEIGHT - 2 - position.nb_moves()) / 2) as i32);
     if alpha < min {
@@ -72,7 +69,6 @@ pub fn negamax(position: Board, table: &mut Table, mut alpha: i32, mut beta: i32
         }
     }
 
-    
     let mut move_sort = MoveSort::new();
     for i in (0..Board::WIDTH).rev() {
         let action = possible & Board::col_mask(Board::exploration_order[i as usize]);
