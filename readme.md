@@ -9,4 +9,3 @@ This primary use of this solver is in the Web Assembly component that powers the
 ## Naming
 
 I don't entirely remember the reason behind the naming of the repository. I think I was under the impression that the shell game could also be referred to as "thimbles" and then "rigging" the game would make sense because it's an unbeatable AI? I am deeply suspicious of my previous self's reasoning. But good enough for now.
-
