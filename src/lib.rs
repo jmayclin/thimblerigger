@@ -5,8 +5,8 @@ mod table;
 
 use board::Board;
 use solver::solve;
-use std::fs;
-use std::time::Instant;
+
+
 use table::Table;
 use wasm_bindgen::prelude::*;
 
@@ -14,7 +14,7 @@ use wasm_bindgen::prelude::*;
 pub fn do_the_magic(state: String) -> String {
     let board = Board::construct(&state);
     let mut table = Table::new();
-    let (result, action) = solve(board, &mut table);
+    let (_result, _action) = solve(board, &mut table);
     let (result, mut action) = solve(board, &mut table);
     action += 1;
     format!("{{\"utility\":{},\"action\":{}}}", result, action)

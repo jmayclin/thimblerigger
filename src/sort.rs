@@ -19,7 +19,7 @@ impl MoveSort {
             value: 0,
         }; board::Board::WIDTH as usize];
         MoveSort {
-            moves: moves,
+            moves,
             size: 0,
         }
     }

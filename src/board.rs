@@ -24,7 +24,7 @@ impl Board {
     pub fn construct(instructions: &str) -> Board {
         let mut board = Board::new();
         for play in instructions.chars() {
-            if !play.is_digit(10) {
+            if !play.is_ascii_digit() {
                 continue;
             }
             let col = play.to_digit(10).unwrap() as u8;
@@ -40,7 +40,7 @@ impl Board {
     fn bottom_mask() -> u64 {
         // why can't I use addition here?
         (0..Board::WIDTH).fold(0_u64, |accum, col| {
-            accum + (1_u64 << col * (Board::HEIGHT + 1))
+            accum + (1_u64 << (col * (Board::HEIGHT + 1)))
         })
     }
 
@@ -78,7 +78,7 @@ impl Board {
                 return i;
             }
         }
-        return 255; // this should never happen
+        255 // this should never happen
     }
 
     pub fn possible_move(&self) -> u8 {
@@ -88,7 +88,7 @@ impl Board {
                 return i;
             }
         }
-        return 0; // this should never happen
+        0 // this should never happen
     }
 
     pub fn action_score(&self, action: u64) -> i32 {
@@ -107,9 +107,8 @@ impl Board {
     }
 
     fn opponent_winning_moves(&self) -> u64 {
-        let result =
-            Board::compute_winning_moves(self.stones_player ^ self.stones_all, self.stones_all);
-        result
+        
+        Board::compute_winning_moves(self.stones_player ^ self.stones_all, self.stones_all)
     }
 
     pub fn nonlosing_moves(&self) -> u64 {
@@ -135,32 +134,32 @@ impl Board {
 
         //horizontal
         intermediary = self.stones_player << (Board::HEIGHT + 1)
-            & self.stones_player << (Board::HEIGHT + 1) * 2;
-        result |= intermediary & self.stones_player << (Board::HEIGHT + 1) * 3;
+            & self.stones_player << ((Board::HEIGHT + 1) * 2);
+        result |= intermediary & self.stones_player << ((Board::HEIGHT + 1) * 3);
         result |= intermediary & self.stones_player >> (Board::HEIGHT + 1);
         intermediary = self.stones_player >> (Board::HEIGHT + 1)
-            & self.stones_player >> (Board::HEIGHT + 1) * 2;
-        result |= intermediary & self.stones_player >> (Board::HEIGHT + 1) * 3;
+            & self.stones_player >> ((Board::HEIGHT + 1) * 2);
+        result |= intermediary & self.stones_player >> ((Board::HEIGHT + 1) * 3);
         result |= intermediary & self.stones_player << (Board::HEIGHT + 1);
         // diagonal 1
         intermediary =
-            self.stones_player << Board::HEIGHT & self.stones_player << 2 * Board::HEIGHT;
+            self.stones_player << Board::HEIGHT & self.stones_player << (2 * Board::HEIGHT);
         result |= intermediary & self.stones_player >> Board::HEIGHT;
-        result |= intermediary & self.stones_player << 3 * Board::HEIGHT;
+        result |= intermediary & self.stones_player << (3 * Board::HEIGHT);
         intermediary =
-            self.stones_player >> Board::HEIGHT & self.stones_player >> 2 * Board::HEIGHT;
+            self.stones_player >> Board::HEIGHT & self.stones_player >> (2 * Board::HEIGHT);
         result |= intermediary & self.stones_player << Board::HEIGHT;
-        result |= intermediary & self.stones_player >> 3 * Board::HEIGHT;
+        result |= intermediary & self.stones_player >> (3 * Board::HEIGHT);
 
         // diagonal 2
         intermediary =
-            self.stones_player << Board::HEIGHT + 2 & self.stones_player << 2 * (Board::HEIGHT + 2);
-        result |= intermediary & self.stones_player << (Board::HEIGHT + 2) * 3;
-        result |= intermediary & self.stones_player >> Board::HEIGHT + 2;
+            self.stones_player << (Board::HEIGHT + 2) & self.stones_player << (2 * (Board::HEIGHT + 2));
+        result |= intermediary & self.stones_player << ((Board::HEIGHT + 2) * 3);
+        result |= intermediary & self.stones_player >> (Board::HEIGHT + 2);
         intermediary =
-            self.stones_player >> Board::HEIGHT + 2 & self.stones_player >> 2 * (Board::HEIGHT + 2);
-        result |= intermediary & self.stones_player >> (Board::HEIGHT + 2) * 3;
-        result |= intermediary & self.stones_player << Board::HEIGHT + 2;
+            self.stones_player >> (Board::HEIGHT + 2) & self.stones_player >> (2 * (Board::HEIGHT + 2));
+        result |= intermediary & self.stones_player >> ((Board::HEIGHT + 2) * 3);
+        result |= intermediary & self.stones_player << (Board::HEIGHT + 2);
 
         result & (Board::board_mask() ^ self.stones_all)
         //result
@@ -174,30 +173,30 @@ impl Board {
 
         //horizontal
         intermediary =
-            stones_player << (Board::HEIGHT + 1) & stones_player << (Board::HEIGHT + 1) * 2;
-        result |= intermediary & stones_player << (Board::HEIGHT + 1) * 3;
+            stones_player << (Board::HEIGHT + 1) & stones_player << ((Board::HEIGHT + 1) * 2);
+        result |= intermediary & stones_player << ((Board::HEIGHT + 1) * 3);
         result |= intermediary & stones_player >> (Board::HEIGHT + 1);
         intermediary =
-            stones_player >> (Board::HEIGHT + 1) & stones_player >> (Board::HEIGHT + 1) * 2;
-        result |= intermediary & stones_player >> (Board::HEIGHT + 1) * 3;
+            stones_player >> (Board::HEIGHT + 1) & stones_player >> ((Board::HEIGHT + 1) * 2);
+        result |= intermediary & stones_player >> ((Board::HEIGHT + 1) * 3);
         result |= intermediary & stones_player << (Board::HEIGHT + 1);
         // diagonal 1
-        intermediary = stones_player << Board::HEIGHT & stones_player << 2 * Board::HEIGHT;
+        intermediary = stones_player << Board::HEIGHT & stones_player << (2 * Board::HEIGHT);
         result |= intermediary & stones_player >> Board::HEIGHT;
-        result |= intermediary & stones_player << 3 * Board::HEIGHT;
-        intermediary = stones_player >> Board::HEIGHT & stones_player >> 2 * Board::HEIGHT;
+        result |= intermediary & stones_player << (3 * Board::HEIGHT);
+        intermediary = stones_player >> Board::HEIGHT & stones_player >> (2 * Board::HEIGHT);
         result |= intermediary & stones_player << Board::HEIGHT;
-        result |= intermediary & stones_player >> 3 * Board::HEIGHT;
+        result |= intermediary & stones_player >> (3 * Board::HEIGHT);
 
         // diagonal 2
         intermediary =
-            stones_player << Board::HEIGHT + 2 & stones_player << 2 * (Board::HEIGHT + 2);
-        result |= intermediary & stones_player << (Board::HEIGHT + 2) * 3;
-        result |= intermediary & stones_player >> Board::HEIGHT + 2;
+            stones_player << (Board::HEIGHT + 2) & stones_player << (2 * (Board::HEIGHT + 2));
+        result |= intermediary & stones_player << ((Board::HEIGHT + 2) * 3);
+        result |= intermediary & stones_player >> (Board::HEIGHT + 2);
         intermediary =
-            stones_player >> Board::HEIGHT + 2 & stones_player >> 2 * (Board::HEIGHT + 2);
-        result |= intermediary & stones_player >> (Board::HEIGHT + 2) * 3;
-        result |= intermediary & stones_player << Board::HEIGHT + 2;
+            stones_player >> (Board::HEIGHT + 2) & stones_player >> (2 * (Board::HEIGHT + 2));
+        result |= intermediary & stones_player >> ((Board::HEIGHT + 2) * 3);
+        result |= intermediary & stones_player << (Board::HEIGHT + 2);
 
         result & (Board::board_mask() ^ stones_all)
         //result
@@ -212,7 +211,7 @@ impl Board {
     }
 
     pub fn col_mask(col: u8) -> u64 {
-        (1_u64 << Board::HEIGHT) - 1 << (col * (Board::HEIGHT + 1))
+        ((1_u64 << Board::HEIGHT) - 1) << (col * (Board::HEIGHT + 1))
     }
 
     fn bottom_mask_col(col: u8) -> u64 {
@@ -246,7 +245,7 @@ impl Board {
                     print!(" ");
                 }
             }
-            print!("\n");
+            println!();
         }
         println!("-------");
     }
@@ -322,12 +321,12 @@ mod tests {
     #[test]
     fn opponent_win() {
         let board_org = Board::construct("13141");
-        let mut board = Board::construct("13141");
+        let board = Board::construct("13141");
         let op_win = board.opponent_winning_moves();
         assert_eq!(board, board_org);
 
         assert_eq!(op_win, 1_u64 << 3);
-        let mut board = Board::construct("1");
+        let board = Board::construct("1");
 
         assert_eq!(
             board.nonlosing_moves() ^ (1_u64 << 1) | 1_u64,

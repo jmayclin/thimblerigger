@@ -54,9 +54,9 @@ impl Table {
         let index = (position.hash() % Table::CAPACITY) as usize;
         let node = self.contents[index];
         if node.get_hash() == position.hash() {
-            return Some(node.get_value() as i32);
+            Some(node.get_value() as i32)
         } else {
-            return None;
+            None
         }
     }
 

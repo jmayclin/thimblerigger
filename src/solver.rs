@@ -29,7 +29,7 @@ pub fn solve(position: Board, table: &mut Table) -> (i32, i32) {
             min = result;
         }
     }
-    return (min, action);
+    (min, action)
 }
 
 // at least alpha, at most beta
@@ -83,7 +83,7 @@ pub fn negamax(position: Board, table: &mut Table, mut alpha: i32, mut beta: i32
         let action = move_sort.get_next();
         let mut next_position = position;
         next_position.play_col(action);
-        let (mut score, step) = negamax(next_position, table, -beta, -alpha);
+        let (mut score, _step) = negamax(next_position, table, -beta, -alpha);
         score = -score;
         if score >= beta {
             return (score, action as i32);
@@ -111,5 +111,5 @@ pub fn negamax(position: Board, table: &mut Table, mut alpha: i32, mut beta: i32
 
     table.add(&position, alpha - Board::MIN_SCORE + 1);
 
-    return (alpha, best_action);
+    (alpha, best_action)
 }

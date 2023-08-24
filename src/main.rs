@@ -11,7 +11,7 @@ use solver::solve;
 use std::fs;
 use std::time::Instant;
 use table::Table;
-use wasm_bindgen::prelude::*;
+
 
 fn generate_cache(board: String, depth: u8, table: &mut Table) {
     if depth == 0 {
@@ -73,7 +73,7 @@ fn evaluate_test_sets() {
         "test_cases/Test_L1_R2",
         "test_cases/Test_L1_R3",
     ];
-    let mut count = 0;
+    let _count = 0;
     for file in files {
         println!("calculating for {}", file);
         let mut count = 0;
@@ -81,9 +81,9 @@ fn evaluate_test_sets() {
         let now = Instant::now();
         for line in fs::read_to_string(file).unwrap().lines() {
             count += 1;
-            let mut itr = line.split(" ");
+            let mut itr = line.split(' ');
             let state = itr.next().unwrap();
-            let board = Board::construct(&state);
+            let board = Board::construct(state);
             let expect = itr.next().unwrap().parse::<i32>().unwrap();
             //let min = -100;
             //let max = 100;
@@ -99,7 +99,7 @@ fn evaluate_test_sets() {
             }
             println!("result of {} achieved by playing {}", result, action);
 
-            if !(action >= 0 && action <= 6) {
+            if !(0..=6).contains(&action) {
                 panic!();
             }
             if file == "test_cases/Test_L1_R3" {
